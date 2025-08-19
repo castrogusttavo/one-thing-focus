@@ -21,7 +21,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install Rust (stable)
         uses: dtolnay/rust-toolchain@stable
@@ -30,6 +30,11 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
+
+      - name: Install dependencies (macOS only)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          brew install vips pkg-config
 
       - name: Install dependencies (Ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
@@ -45,6 +50,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          packageManager: npm
           tagName: ${{ github.ref_name }}
           releaseName: 'One Thing Focus v${{ github.ref_name }}'
           releaseBody: 'Veja as mudanças nesta release no CHANGELOG.md'
